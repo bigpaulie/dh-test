@@ -1,0 +1,27 @@
+name: Tag on Commit
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    tag:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out the code
+              uses: actions/checkout@v2
+
+            - name: Determine version and create tag
+              id: version-tag
+              run: |
+                  npm install semver
+                  version=$(node -e "const semver = require('semver'); const commits = process.env.GITHUB_EVENT_PATH ? require(process.env.GITHUB_EVENT_PATH).commits : []; const commitMessages = commits.map(commit => commit.message); console.log(semver.inc('1.0.0', 'patch', { includePrerelease: true }));")
+                  echo "::set-output name=version::$version"
+
+            - name: Create and push tag
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  version=$(/bin/echo -n "${{ steps.version-tag.outputs.version }}")
+                  git tag "v$version"
+                  git push origin "v$version"
