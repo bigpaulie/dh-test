@@ -1,26 +1,66 @@
-name: Tag on Commit
+name: Semantic Versioning
+
 on:
     push:
         branches:
             - main
 
 jobs:
-    tag:
+    version:
         runs-on: ubuntu-latest
+
         steps:
-            - name: Check out the code
-              uses: actions/checkout@v2
-
-            - name: Determine version and create tag
-              id: version-tag
+            - name: Determine Previous Version
+              id: get_previous_version
               run: |
-                  version=$(docker run --rm -v "$(pwd)":/app alpine/semver semver -i patch)
-                  echo "VERSION=$version" >> $GITHUB_ENV
+                  if [ -f .semver ]; then
+                    previous_version=$(cat .semver)
+                  else
+                    # Determine the latest release version using git tags
+                    latest_release_tag=$(git describe --tags --abbrev=0)
+                  
+                    if [ -z "$latest_release_tag" ]; then
+                      previous_version="1.0.0"
+                    else
+                      previous_version=${latest_release_tag#v}
+                    fi
+                  fi
+                  echo "PREVIOUS_VERSION=$previous_version" >> $GITHUB_ENV
 
-            - name: Create and push tag
-              env:
-                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
+            - name: Check Commit Messages
+              id: check_commits
               run: |
-                  version=$VERSION
-                  git tag "v$version"
-                  git push origin "v$version"
+                  increment=""
+                  if git log --format=%B -n 1 HEAD | grep -qE "^feat:"; then
+                    increment="major"
+                  elif git log --format=%B -n 1 HEAD | grep -qE "^fix:"; then
+                    increment="minor"
+                  elif git log --format=%B -n 1 HEAD | grep -qE "^docs:"; then
+                    increment="patch"
+                  fi
+                  echo "INCREMENT=$increment" >> $GITHUB_ENV
+
+            - name: Increment Version
+              id: increment_version
+              run: |
+                  if [[ "$INCREMENT" == "major" ]]; then
+                    semver -c -i major $PREVIOUS_VERSION
+                  elif [[ "$INCREMENT" == "minor" ]]; then
+                    semver -c -i minor $PREVIOUS_VERSION
+                  elif [[ "$INCREMENT" == "patch" ]]; then
+                    semver -c -i patch $PREVIOUS_VERSION
+                  else
+                    # If no increment found, use the previous version as is
+                    echo "VERSION=$PREVIOUS_VERSION" >> $GITHUB_ENV
+                  fi
+
+            - name: Display New Version
+              run: |
+                  echo "Previous version: $PREVIOUS_VERSION"
+                  echo "New version: $VERSION"
+
+            - name: Create and Push New Tag
+              if: ${{ steps.check_commits.outputs.increment }} != ''
+              run: |
+                  git tag -a -m "Release $VERSION" v$VERSION
+                  git push origin v$VERSION
