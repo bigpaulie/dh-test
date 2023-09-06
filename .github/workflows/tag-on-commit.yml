@@ -56,11 +56,6 @@ jobs:
                   fi
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-            - name: Configure git identity
-              run: |
-                  git config --global user.name "GitHub Actions"
-                  git config --global user.email "actions@github.com"
-
             - name: Display New Version
               run: |
                   echo "Previous version: $PREVIOUS_VERSION"
@@ -70,3 +65,5 @@ jobs:
               run: |
                   git tag -a "$VERSION" -m "Release version $VERSION"
                   git push origin "$VERSION"
+              env:
+                GITHUB_TOKEN: ${{ secrets.TOKEN }}
