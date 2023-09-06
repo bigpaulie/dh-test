@@ -57,13 +57,13 @@ jobs:
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
 
             - name: Display New Version
-              if: $VERSION != $PREVIOUS_VERSION  # Only run if keywords were found
+              if: ${{ env.VERSION != env.PREVIOUS_VERSION }}  # Only run if keywords were found
               run: |
                   echo "Previous version: $PREVIOUS_VERSION"
                   echo "New version: $VERSION"
 
             - name: Create Tag
-              if: $VERSION != $PREVIOUS_VERSION  # Only run if keywords were found
+              if: ${{ env.VERSION != env.PREVIOUS_VERSION }}  # Only run if keywords were found
               env:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
               run: |
