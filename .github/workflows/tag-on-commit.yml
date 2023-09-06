@@ -74,5 +74,5 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
               run: |
-                  git tag -a "$VERSION" -m "Release version $VERSION"
-                  git push origin "$VERSION"
+                  git tag -a $VERSION -m "Release version $VERSION"
+                  git push origin $VERSION
