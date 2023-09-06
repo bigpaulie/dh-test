@@ -6,3 +6,4 @@ console.log("some fix");
 console.log("some docs");
 console.log("new feature");
 console.log("new chore");
+console.log("new chore");
