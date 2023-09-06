@@ -71,7 +71,7 @@ jobs:
                   sudo apt install hub
 
             - name: Create Tag
+              env:
+                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
               run: |
                   hub tag "$VERSION" -m "Release version $VERSION"
-              env:
-                GITHUB_TOKEN: ${{ secrets.TOKEN }}
