@@ -32,11 +32,15 @@ jobs:
               id: check_commits
               run: |
                   increment=""
-                  if git log --format=%B -n 1 HEAD | grep -qE "^feat:"; then
+                  if git log --format=%B -n 1 HEAD | grep -qE "^feat!:"; then
                     increment="major"
+                  elif git log --format=%B -n 1 HEAD | grep -qE "^feat:"; then
+                    increment="minor"
                   elif git log --format=%B -n 1 HEAD | grep -qE "^fix:"; then
                     increment="minor"
                   elif git log --format=%B -n 1 HEAD | grep -qE "^docs:"; then
+                    increment="patch"
+                  elif git log --format=%B -n 1 HEAD | grep -qE "^chore:"; then
                     increment="patch"
                   fi
                   echo "INCREMENT=$increment" >> $GITHUB_ENV
