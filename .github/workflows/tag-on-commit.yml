@@ -41,18 +41,9 @@ jobs:
                   fi
                   echo "INCREMENT=$increment" >> $GITHUB_ENV
 
-            - name: Check Commit Message Keywords
-              id: check_keywords
-              run: |
-                  # Check if the commit message contains any of the specified keywords
-                  if ! git log --format=%B -n 1 HEAD | grep -qE "^(feat:|fix:|docs:)"; then
-                    echo "Commit message does not contain keywords (feat:, fix:, docs:, chore:). Skipping further steps."
-                    exit 0  # Gracefully stop the pipeline
-                  fi
-
             - name: Increment Version
               id: increment_version
-              if: steps.check_keywords.outputs.INCREMENT != ''  # Only run if keywords were found
+              if: steps.check_commits.outputs.INCREMENT != ''  # Only run if keywords were found
               run: |
                   if [[ "$INCREMENT" == "major" ]]; then
                     VERSION=$(docker run --rm alpine/semver semver -c -i major $PREVIOUS_VERSION)
@@ -67,13 +58,13 @@ jobs:
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
 
             - name: Display New Version
-              if: steps.check_keywords.outputs.INCREMENT != ''  # Only run if keywords were found
+              if: steps.check_commits.outputs.INCREMENT != ''  # Only run if keywords were found
               run: |
                   echo "Previous version: $PREVIOUS_VERSION"
                   echo "New version: $VERSION"
 
             - name: Create Tag
-              if: steps.check_keywords.outputs.INCREMENT != ''  # Only run if keywords were found
+              if: steps.check_commits.outputs.INCREMENT != ''  # Only run if keywords were found
               env:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
               run: |
