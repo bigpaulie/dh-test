@@ -45,11 +45,11 @@ jobs:
               id: increment_version
               run: |
                   if [[ "$INCREMENT" == "major" ]]; then
-                    semver -c -i major $PREVIOUS_VERSION
+                    docker run --rm alpine/semver semver -c -i major $PREVIOUS_VERSION
                   elif [[ "$INCREMENT" == "minor" ]]; then
-                    semver -c -i minor $PREVIOUS_VERSION
+                    docker run --rm alpine/semver semver -c -i minor $PREVIOUS_VERSION
                   elif [[ "$INCREMENT" == "patch" ]]; then
-                    semver -c -i patch $PREVIOUS_VERSION
+                    docker run --rm alpine/semver semver -c -i patch $PREVIOUS_VERSION
                   else
                     # If no increment found, use the previous version as is
                     echo "VERSION=$PREVIOUS_VERSION" >> $GITHUB_ENV
