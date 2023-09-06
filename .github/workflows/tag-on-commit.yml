@@ -52,6 +52,7 @@ jobs:
 
             - name: Increment Version
               id: increment_version
+              if: steps.check_keywords.outputs.INCREMENT != ''  # Only run if keywords were found
               run: |
                   if [[ "$INCREMENT" == "major" ]]; then
                     VERSION=$(docker run --rm alpine/semver semver -c -i major $PREVIOUS_VERSION)
@@ -66,11 +67,13 @@ jobs:
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
 
             - name: Display New Version
+              if: steps.check_keywords.outputs.INCREMENT != ''  # Only run if keywords were found
               run: |
                   echo "Previous version: $PREVIOUS_VERSION"
                   echo "New version: $VERSION"
 
             - name: Create Tag
+              if: steps.check_keywords.outputs.INCREMENT != ''  # Only run if keywords were found
               env:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
               run: |
