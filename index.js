@@ -3,3 +3,4 @@ console.log("new feature");
 console.log("new feature");
 console.log("some commit");
 console.log("some fix");
+console.log("some docs");
