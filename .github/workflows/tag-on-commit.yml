@@ -45,17 +45,23 @@ jobs:
               id: increment_version
               run: |
                   if [[ "$INCREMENT" == "major" ]]; then
-                    docker run --rm alpine/semver semver -c -i major $PREVIOUS_VERSION
+                    VERSION=$(docker run --rm alpine/semver semver -c -i major $PREVIOUS_VERSION)
                   elif [[ "$INCREMENT" == "minor" ]]; then
-                    docker run --rm alpine/semver semver -c -i minor $PREVIOUS_VERSION
+                    VERSION=$(docker run --rm alpine/semver semver -c -i minor $PREVIOUS_VERSION)
                   elif [[ "$INCREMENT" == "patch" ]]; then
-                    docker run --rm alpine/semver semver -c -i patch $PREVIOUS_VERSION
+                    VERSION=$(docker run --rm alpine/semver semver -c -i patch $PREVIOUS_VERSION)
                   else
                     # If no increment found, use the previous version as is
                     echo "VERSION=$PREVIOUS_VERSION" >> $GITHUB_ENV
                   fi
+                  echo "VERSION=$VERSION" >> $GITHUB_ENV
 
             - name: Display New Version
               run: |
                   echo "Previous version: $PREVIOUS_VERSION"
                   echo "New version: $VERSION"
+
+            - name: Create Tag
+              run: |
+                  git tag -a "$VERSION" -m "Release version $VERSION"
+                  git push origin "$VERSION"
