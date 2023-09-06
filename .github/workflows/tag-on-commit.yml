@@ -53,6 +53,7 @@ jobs:
                   else
                     # If no increment found, use the previous version as is
                     echo "VERSION=$PREVIOUS_VERSION" >> $GITHUB_ENV
+                    exit 0
                   fi
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
 
