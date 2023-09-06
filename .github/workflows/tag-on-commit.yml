@@ -56,6 +56,11 @@ jobs:
                   fi
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+            - name: Configure git identity
+              run: |
+                  git config --global user.name "Paul P."
+                  git config --global user.email "bigpaulie25ro@yahoo.com"
+
             - name: Display New Version
               run: |
                   echo "Previous version: $PREVIOUS_VERSION"
