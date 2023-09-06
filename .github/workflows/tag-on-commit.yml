@@ -36,6 +36,8 @@ jobs:
                     increment="major"
                   elif git log --format=%B -n 1 HEAD | grep -qE "^feat:"; then
                     increment="minor"
+                  elif git log --format=%B -n 1 HEAD | grep -qE "^fix!:"; then
+                    increment="major"
                   elif git log --format=%B -n 1 HEAD | grep -qE "^fix:"; then
                     increment="minor"
                   elif git log --format=%B -n 1 HEAD | grep -qE "^docs:"; then
