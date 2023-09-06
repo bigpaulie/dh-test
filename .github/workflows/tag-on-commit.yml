@@ -56,24 +56,16 @@ jobs:
                   fi
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-            - name: Configure git identity
-              run: |
-                  git config --global user.name "Paul P."
-                  git config --global user.email "bigpaulie25ro@yahoo.com"
-
             - name: Display New Version
               run: |
                   echo "Previous version: $PREVIOUS_VERSION"
                   echo "New version: $VERSION"
 
-            - name: Install hub
-              run: |
-                  sudo apt install hub
-
             - name: Create Tag
               env:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
               run: |
-                  git tag -a $VERSION -m "Release version $VERSION"
-                  echo "TAG=$VERSION" >> $GITHUB_ENV
-                  git push origin $VERSION
+                  git config user.name "GitHub Actions"
+                  git config user.email "github-actions@users.noreply.github.com"
+                  git tag $VERSION
+                  git push origin $NEW_TAG
