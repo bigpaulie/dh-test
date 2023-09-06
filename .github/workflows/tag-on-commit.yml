@@ -12,23 +12,25 @@ jobs:
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0  # Fetch all tags
 
             - name: Determine Previous Version
               id: get_previous_version
               run: |
-                  if [ -f .semver ]; then
-                    previous_version=$(cat .semver)
+                if [ -f .semver ]; then
+                  previous_version=$(cat .semver)
+                else
+                  # Determine the latest release version using git tags
+                  latest_release_tag=$(git describe --tags --abbrev=0 2>/dev/null)
+                
+                  if [ -z "$latest_release_tag" ]; then
+                    previous_version="1.0.0"
                   else
-                    # Determine the latest release version using git tags
-                    latest_release_tag=$(git describe --tags --abbrev=0 2>/dev/null)
-                  
-                    if [ -z "$latest_release_tag" ]; then
-                      previous_version="1.0.0"
-                    else
-                      previous_version=${latest_release_tag#v}
-                    fi
+                    previous_version=${latest_release_tag#v}
                   fi
-                  echo "PREVIOUS_VERSION=$previous_version" >> $GITHUB_ENV
+                fi
+                echo "PREVIOUS_VERSION=$previous_version" >> $GITHUB_ENV
 
             - name: Check Commit Messages
               id: check_commits
